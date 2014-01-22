@@ -1,0 +1,16 @@
+4600afa9562e5ca17b14a5502225e110 *DESCRIPTION
+5e5e250e96e7181317e85a683ca4c099 *NAMESPACE
+b2d537ee63a2fe84f90703d3e10e28d4 *R/DatePhylo.R
+80c9431e00e9c4fd5085906caf8c5458 *R/FindDescendants.R
+8760b8f74d4b93cd5f8002d63d87c1ef *R/StratPhyloCongruence.R
+9f219d0b9c06a0a2790969695944ab15 *R/geoscalePhylo.R
+a517e4fdc3776756b4a7ccea309faa45 *R/strap-internal.R
+6c8344c35d89cade5ea887aac1ad1065 *data/Asaphidae.RData
+3270bda46afdcb65ff911e60adef5108 *data/Dipnoi.RData
+c68f4294b958c3cf19e6f8f7f0a59616 *man/Asaphidae.Rd
+50212201f8dec902beb711f7ee817ea1 *man/DatePhylo.Rd
+b781d554b5209f7ea7732f9562a94ca0 *man/Dipnoi.Rd
+94e6094db14e005ed1001c2b76dff691 *man/FindDescendants.Rd
+a1fe8fbe7128087050c244850ad0de92 *man/StratPhyloCongruence.Rd
+fade779014cbc9ea1f9fd3b5abb9fc1a *man/geoscalePhylo.Rd
+079e16df6c14e1f4d4f61399532c8056 *man/strap-package.Rd
