@@ -1,4 +1,4 @@
-DatePhylo <- function(tree, ages, rlen=0, method="standard", add.terminal=FALSE) {
+DatePhylo <- function(tree, ages, rlen=0, method="basic", add.terminal=FALSE) {
 
   # Stop if using Ruta method but not supplying a tree with branch lengths:
   if(is.null(tree$edge.length) && method == "ruta") stop("Tree has no branch lengths (required for Ruta method).")
@@ -9,8 +9,17 @@ DatePhylo <- function(tree, ages, rlen=0, method="standard", add.terminal=FALSE)
   # Stop if the ages matrix does not have columns namd "FAD" and "LAD":
   if(length(match(c("FAD", "LAD"), colnames(ages))) < 2) stop("Ages matrix must have FAD and LAD (First and Last Appearance Datum) columns.")
 
+  # Stop if any FAD is younger than its LAD:
+  if(any(ages[, "FAD"] < ages[, "LAD"])) stop("FADs must all be at least as old as LADs.")
+
+  # Stop if root length is negative:
+  if(rlen < 0) stop("Root length cannot be negative.")
+
   # Stop if problem with root length:
-  if(rlen == 0 && method != "standard") stop("If not using the standard method then rlen (root length) must be a positive value.")
+  if(rlen == 0 && method != "basic") stop("If not using the basic method then rlen (root length) must be a positive value.")
+
+  # Stop if method not available:
+  if(method != "basic" && method != "ruta" && method != "equal") stop("Method must be one of basic, equal, or ruta.")
 
   # If method is not Ruta set all branch lengths equal to 1:
   if(is.null(tree$edge.length) || method != "ruta") tree$edge.length <- rep(1, length(tree$edge[, 1]))
@@ -36,8 +45,8 @@ DatePhylo <- function(tree, ages, rlen=0, method="standard", add.terminal=FALSE)
   # Add branch lengths as time:
   time.tree$edge.length <- abs(apply(matrix(all.ages[tree$edge], ncol=2), 1, diff))
 
-  # Only continue if non standard dating option chosen:
-  if (method != "standard") {
+  # Only continue if non basic dating option chosen:
+  if (method != "basic") {
     
     # Keep going until there are no zero-length branches:
     while(min(time.tree$edge.length[grep(TRUE, tree$edge.length > 0)]) == 0) {

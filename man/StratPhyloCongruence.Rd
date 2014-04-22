@@ -6,7 +6,7 @@
 
 \description{Calculates SCI, RCI, MSM*, and GER for a number of topologies.}
 
-\usage{StratPhyloCongruence(trees, ages, rlen=0, method="standard", samp.perm=1000,
+\usage{StratPhyloCongruence(trees, ages, rlen=0, method="basic", samp.perm=1000,
 	rand.perm=1000, hard=TRUE, randomly.sample.ages=FALSE, fix.topology=FALSE,
 	fix.outgroup=TRUE)}
 
@@ -96,7 +96,7 @@ This function produces both values for all four main metrics: the Stratigraphic 
 
 \bold{Additional options}
 
-	Note that because this function uses \code{\link{DatePhylo}} the user has the option of using different tree dating algorithms than the \code{standard} method (equivalent to the \code{basic} method in the \code{paleotree} package) employed in all the published studies cited above (and the default option here). The dating method used will apply to all trees generated, including the input, sampled, and randomly generated topologies. In all cases the time-scaled trees are returned with the function output.
+	Note that because this function uses \code{\link{DatePhylo}} the user has the option of using different tree dating algorithms than the \code{basic} method (equivalent to the \code{basic} method in the \code{paleotree} package) employed in all the published studies cited above (and the default option here). The dating method used will apply to all trees generated, including the input, sampled, and randomly generated topologies. In all cases the time-scaled trees are returned with the function output.
 
 	A final option (\code{fix.outgroup=TRUE}) allows the user to always use the same outgroup taxon (based on the first input tree) for all randomly generated topologies. Because the outgroup will often be the oldest taxon and its position in the input topologies is not allowed to vary letting it do so in the random topologies may lead to inferring a better fit to stratigraphy for the observed tree(s) than is fair. Fixing the outgroup thus ameliorates this potential bias and is the default option here.
 }
@@ -136,7 +136,7 @@ Wills, M. A., Barrett, P. M. and Heathcote, J. F., 2008. The modified Gap Excess
 # Calculate stratigraphic fit measures treating ages as ranges
 # (permutation numbers used are lower than recommended for standard use):
 fit.to.strat.1 <- StratPhyloCongruence(trees=Dipnoi$tree, ages=Dipnoi$ages, rlen=0,
-	method="standard", samp.perm=5, rand.perm=5, hard=TRUE,
+	method="basic", samp.perm=5, rand.perm=5, hard=TRUE,
 	randomly.sample.ages=FALSE, fix.topology=FALSE, fix.outgroup=TRUE)
 fit.to.strat.1 # View all output
 names(fit.to.strat.1) # Show output options
@@ -145,6 +145,6 @@ fit.to.strat.1$input.tree.results # Show just the output for the input tree(s)
 # Calculate stratigraphic fit measures treating ages as uncertainties
 # (permutation numbers used are lower than recommended for standard use):
 #fit.to.strat.2 <- StratPhyloCongruence(trees=Dipnoi$tree, ages=Dipnoi$ages, rlen=0,
-#	method="standard", samp.perm=10, rand.perm=10, hard=TRUE,
+#	method="basic", samp.perm=10, rand.perm=10, hard=TRUE,
 #	randomly.sample.ages=TRUE, fix.topology=FALSE, fix.outgroup=TRUE)
 }

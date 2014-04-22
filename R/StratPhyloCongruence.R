@@ -1,4 +1,7 @@
-StratPhyloCongruence <- function(trees, ages, rlen=0, method="standard", samp.perm=1000, rand.perm=1000, hard=TRUE, randomly.sample.ages=FALSE, fix.topology=FALSE, fix.outgroup=TRUE) {
+StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=1000, rand.perm=1000, hard=TRUE, randomly.sample.ages=FALSE, fix.topology=FALSE, fix.outgroup=TRUE) {
+
+  # Make sure permutation numbers are not negative:
+  if(samp.perm <= 0 || rand.perm <= 0) stop("Number of permutations must be positive.")
 
   # Calculate sum of stratigraphic ranges of taxa (SRL):
   SRL <- sum(ages[, "FAD"] - ages[, "LAD"])
@@ -245,7 +248,8 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="standard", samp.pe
   
   # Annotate matrix:
   colnames(input.permutations) <- c("SCI", "RCI", "GER", "MSM*", "p.SCI", "p.RCI", "p.GER", "p.MSM*", "GER*", "GERt")
-  
+  rownames(input.permutations) <- paste("tree_",c(1:length(trees)),sep="")  
+
   # Calculate Gmax (the worst possible fit to stratigraphy):
   Gmax <- sum(root.age - ages[, "FAD"])
   
