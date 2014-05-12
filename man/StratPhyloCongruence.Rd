@@ -102,9 +102,9 @@ This function produces both values for all four main metrics: the Stratigraphic 
 }
 
 \value{
-\item{input.tree.results}{A matrix with a row for each input tree and columns indicating the values for SCI, RCI, GER and MSM* and their corresponding probabilities (p.SCI, p.RCI, p.GER, and p.MSM*) as well as GERt and GER*.}
-\item{samp.permutation.results}{If used, a matrix with a row for each sampled tree (up to \code{samp.perm}) and columns indicating the values for SCI, RCI, GER and MSM* and their corresponding probabilities (p.SCI, p.RCI, p.GER, and p.MSM*) as well as GERt and GER*.}
-\item{rand.permutations}{A matrix with a row for each randomly generated tree (up to \code{rand.perm}) and columns indicating the values for SCI, RCI, GER and MSM*}
+\item{input.tree.results}{A matrix with a row for each input tree and columns indicating the values for SCI, RCI, GER and MSM* and their corresponding probabilities (p.SCI, p.RCI, p.GER, and p.MSM*) as well as GERt, GER*, and MIG.}
+\item{samp.permutation.results}{If used, a matrix with a row for each sampled tree (up to \code{samp.perm}) and columns indicating the values for SCI, RCI, GER and MSM* and their corresponding probabilities (p.SCI, p.RCI, p.GER, and p.MSM*) as well as GERt, GER*, and MIG.}
+\item{rand.permutations}{A matrix with a row for each randomly generated tree (up to \code{rand.perm}) and columns indicating the values for SCI, RCI, GER, MSM*, and MIG.}
 \item{input.trees}{The input tree(s) as a phylo or multiphylo object, with branches scaled to time according to the input values passed to \link{DatePhylo}.}
 \item{samp.trees}{The sampled tree(s) as a phylo or multiphylo object, with branches scaled to time according to the input values passed to \link{DatePhylo}.}
 \item{rand.trees}{The randomly generated tree(s) as a phylo or multiphylo object, with branches scaled to time according to the input values passed to \link{DatePhylo}.}

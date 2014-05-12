@@ -73,9 +73,20 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
       return(cat("\n tree$root.time is missing, check tree is time scaled."))
    } else (root.age <- tree$root.time)
   
-    if(missing(x.lim) == TRUE){
-      x.lim <- NULL
-    } else(x.lim=sort(root.age - x.lim))
+  
+  # if x.lim set by user -  
+  
+  if(!missing(x.lim)){
+    x.lim <- sort(root.age - x.lim)
+  } else if(ranges == TRUE && !missing(ages) && missing(x.lim)){
+    x.lim <- (root.age - min(ages)) + diff(range(ages))*0.05
+  } else {
+    x.lim <- NULL
+  }
+  
+# if(missing(x.lim) == TRUE){
+ #     x.lim <- NULL
+ #   } else(x.lim=sort(root.age - x.lim))
   
     timescale<-timescale[order(timescale[,1],decreasing=T),]
     	timescale.rescaled <- timescale

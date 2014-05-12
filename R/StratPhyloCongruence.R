@@ -113,9 +113,9 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=
       # If fixing the outgroup taxon (recommended):
       if(fix.outgroup) {
 
-		# Randomly sample taxon names:
+        # Randomly sample taxon names:
         sampled.names <- sample(rand.trees[[i]]$tip.label)
-		  
+
         # Ensure outgroup taxon is listed first:
         sampled.names <- c(outgroup.taxon, sampled.names[grep(FALSE, sampled.names == outgroup.taxon)])
 
@@ -418,9 +418,15 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=
       setTxtProgressBar(pb, counter)
       
     }
-    
+
+    # Add MIG to the sample permutaion results:
+    samp.permutations <- cbind(samp.permutations, samp.MIG)
+
+    # Add column heading for MIG:
+    colnames(samp.permutations)[length(colnames(samp.permutations))] <- "MIG"
+
   }
-	
+
   # Create matrix to store permutation results:
   rand.permutations <- matrix(nrow=rand.perm, ncol=4)
   
@@ -432,7 +438,7 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=
     
     # Isolate ith random tree:
     rand.tree <- rand.trees[[i]]
-	  
+
     # If fixing the outgroup (recommended):
     if(fix.outgroup == TRUE && fix.topology == FALSE) {
 
@@ -451,7 +457,7 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=
       rand.tree$tip.label <- sample(trees[[1]]$tip.label)
 
     }
-	  
+
     # If using randomly sampled ages:
     if(randomly.sample.ages) {
       
@@ -591,7 +597,7 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=
     # Calculate GERt:
     input.permutations[i, "GERt"] <- 1 - ((obs.MIG[i] - min(rand.MIG)) / (max(rand.MIG) - min(rand.MIG)))
 
-	# If GERt is negative re-scale to 0:
+    # If GERt is negative re-scale to 0:
     if(input.permutations[i, "GERt"] < 0) input.permutations[i, "GERt"] <- 0
 
     # If GERt is greater than 1 re-scale to 1:
@@ -599,12 +605,24 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=
   
   }
 
+  # Add MIG to input permutations:
+  input.permutations <- cbind(input.permutations, obs.MIG)
+
+  # Add MIG to random permutations:
+  rand.permutations <- cbind(rand.permutations, rand.MIG)
+
+  # Add MIG to column headings:
+  colnames(input.permutations)[length(colnames(input.permutations))] <- "MIG"
+
+  # Add MIG to column headings:
+  colnames(rand.permutations)[length(colnames(rand.permutations))] <- "MIG"
+
   # Compile output as list:
   output <- list(input.permutations, samp.permutations, rand.permutations, trees, samp.trees, rand.trees)
 
   # Add names to output:
   names(output) <- c("input.tree.results", "samp.permutation.results", "rand.permutations", "input.trees", "samp.trees", "rand.trees")
-	
+
   # Notify user that run is complete:
   cat(paste("Fit to stratigraphy measures for", nrow(input.permutations), "input trees have been calculated."))
 
