@@ -52,7 +52,7 @@ DatePhylo <- function(tree, ages, rlen=0, method="basic", add.terminal=FALSE) {
     while(min(time.tree$edge.length[grep(TRUE, tree$edge.length > 0)]) == 0) {
       
       # Record top zero-length branch encountered that is not also a zero change branch if using the Ruta method:
-      share.branches <- intersect(grep(TRUE, time.tree$edge.length == 0), grep(TRUE, tree$edge.length > 0))[order(dist.nodes(time.tree)[(Ntip(time.tree) + 1), ][time.tree$edge[intersect(grep(TRUE, time.tree$edge.length == 0), grep(TRUE, tree$edge.length > 0)), 2]], decreasing=TRUE)[1]]
+      share.branches <- intersect(grep(TRUE, time.tree$edge.length == 0), grep(TRUE, tree$edge.length > 0))[order(dist.nodes(tree)[(Ntip(tree) + 1), ][tree$edge[intersect(grep(TRUE, time.tree$edge.length == 0), grep(TRUE, tree$edge.length > 0)), 2]], decreasing=TRUE)[1]]
       
       # Keep going until there is a positive length branch:
       while(max(time.tree$edge.length[share.branches]) == 0) {

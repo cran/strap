@@ -3,7 +3,7 @@
 \title{Adds the geological timescale to an phylogeny plot.}
 \description{Plots a time-scaled phylogeny and includes the geological time-scale with a number of possible scales}
 \usage{geoscalePhylo(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "Age"),
-  boxes="Age",tick.scale=boxes, user.scale, cex.age=0.3, cex.ts=0.3, cex.tip=0.3, 
+  boxes="Age",tick.scale="myr", user.scale, cex.age=0.3, cex.ts=0.3, cex.tip=0.3, 
   width=1, ts.col=TRUE, ranges=FALSE, vers="ICS2013", x.lim, quat.rm=FALSE,...)}
 \arguments{
   \item{tree}{A tree as a phylo object.}

@@ -1,9 +1,9 @@
-13e6e2e6c67a7a9f98390da1dbb205ca *DESCRIPTION
+f18864523a98b4f189a30c482c6a5ea7 *DESCRIPTION
 5e5e250e96e7181317e85a683ca4c099 *NAMESPACE
-61ce1b285d339e31f9916dd03367c50b *R/DatePhylo.R
+e6592ca81af9e2057a03ee62a4170ad0 *R/DatePhylo.R
 80c9431e00e9c4fd5085906caf8c5458 *R/FindDescendants.R
 2d5425a11ee21eb92aa2f8d350a9ef95 *R/StratPhyloCongruence.R
-952188c6da77b8d72b246bd9f0b8dedb *R/geoscalePhylo.R
+88a881c87420e188bfba2a036ac909dd *R/geoscalePhylo.R
 a517e4fdc3776756b4a7ccea309faa45 *R/strap-internal.R
 6c8344c35d89cade5ea887aac1ad1065 *data/Asaphidae.RData
 3270bda46afdcb65ff911e60adef5108 *data/Dipnoi.RData
@@ -14,5 +14,5 @@ b781d554b5209f7ea7732f9562a94ca0 *man/Dipnoi.Rd
 94e6094db14e005ed1001c2b76dff691 *man/FindDescendants.Rd
 f2597c426b2648d100c7caac7a998c3c *man/StratPhyloCongruence.Rd
 bb4ef46338d933f2cfce69cf01ad3277 *man/UKzones.Rd
-3d1efa159521feef0227cebc6c5233e6 *man/geoscalePhylo.Rd
-4f8ea6033b8ac25a07bd2b6d64ac3a3b *man/strap-package.Rd
+9a0f7aefc9c4836a7fab84a847ea5992 *man/geoscalePhylo.Rd
+ebb5b23df93ba532caac9a7aa80ae4d7 *man/strap-package.Rd

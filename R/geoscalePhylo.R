@@ -1,5 +1,13 @@
-geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "Age"), boxes="Age", tick.scale=boxes, user.scale, cex.age=0.3, cex.ts=0.3, cex.tip=0.3, width=1, ts.col=TRUE, ranges=FALSE, vers="ICS2013", x.lim, quat.rm=FALSE,...){
-    
+geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "Age"), boxes="Age", tick.scale="myr", user.scale, cex.age=0.3, cex.ts=0.3, cex.tip=0.3, width=1, ts.col=TRUE, ranges=FALSE, vers="ICS2013", x.lim, quat.rm=FALSE,...){
+  
+  if(boxes == "User" && all(units != "User")){
+    boxes <- "no"
+  }
+
+  if(tick.scale == "User" && all(units != "User")){
+    tick.scale <- "myr"
+  }
+   
   if(missing(ages) == TRUE && ranges == TRUE){
     cat("\n ages file is not provided, ranges is to FALSE")
       ranges <- FALSE
@@ -14,8 +22,7 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
     ages<-ages[tree$tip.label,]    
   }
   
-  if(any(units == "User") & !missing(user.scale)){
-    
+  if(any(units == "User") & !missing(user.scale)){   
     Midpoint <- matrix(ncol=1,nrow=length(user.scale[,1]))
       Midpoint[,1] <- (user.scale[,"Start"] + user.scale[,"End"])/2
         user.scale <- cbind(user.scale,Midpoint)  
@@ -37,6 +44,12 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
   units[units == "System"] <- "Period"  
   units[units == "Stage"] <- "Age"
     units <- unique(units)
+  
+  boxes[boxes == "Eonothem"] <- "Eon"
+  boxes[boxes == "Erathem"] <- "Era"
+  boxes[boxes == "Series"] <- "Epoch"
+  boxes[boxes == "System"] <- "Period"  
+  boxes[boxes == "Stage"] <- "Age"
       
   if(ranges == TRUE && missing(ages) == FALSE){
      missing.tip.names <- setdiff(tree$tip.label,row.names(ages))
@@ -71,8 +84,7 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
   
    if(is.null(tree$root.time)){     
       return(cat("\n tree$root.time is missing, check tree is time scaled."))
-   } else (root.age <- tree$root.time)
-  
+   } else {root.age <- tree$root.time}
   
   # if x.lim set by user -  
   
@@ -83,10 +95,6 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
   } else {
     x.lim <- NULL
   }
-  
-# if(missing(x.lim) == TRUE){
- #     x.lim <- NULL
- #   } else(x.lim=sort(root.age - x.lim))
   
     timescale<-timescale[order(timescale[,1],decreasing=T),]
     	timescale.rescaled <- timescale
@@ -110,22 +118,30 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
       if(is.numeric(tick.scale)){
        scale.ages <- tick.scale
       } else {scale.ages=10}
-      
-        ticks <- root.age - seq(0,4600,scale.ticks)
-          time <- seq(0,4600,scale.ages)
-          time2 <- root.age - time
+        
+        tick.position <- root.age - seq(0,4600,scale.ticks)
+          age.name <- seq(0,4600,scale.ages)
+          age.position <- root.age - age.name
             lwd<-c(1,0.5,0.5,0.5,0.5,0.7,0.5,0.5,0.5,0.5)
             col<-c("black","grey","grey","grey","grey")
     }
 
     if(tick.scale != "myr" & is.numeric(tick.scale) == FALSE){
-      time<-subset(timescale,timescale[,"Type"] == tick.scale & timescale[,"Source"] == "ICS")
-        time<-sort(unique(c(time[,1],time[,2])))
-        	time2<-ticks <- root.age - time
+      age.name<-subset(timescale,timescale[,"Type"] == tick.scale & timescale[,"Source"] == "ICS")
+        age.name<-sort(unique(c(age.name[,"Start"],age.name[,"End"])))
+        	age.position<- tick.position <- root.age - age.name
             lwd=1
               col="black"
-    }
-  }
+      
+    } 
+    
+    if(tick.scale == "User"){     
+      age.name <- sort(unique(c(user.scale[,"Start"],user.scale[,"End"])))
+       age.position <- tick.position <- root.age - age.name
+          lwd=1
+            col="black"        
+      }
+   }
   
   # Plotting the tree vertically
   if(upwards == TRUE){
@@ -134,7 +150,7 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
     par(fig=c(0,ts.width,0,1))
      par(mar=c(3,1,2,5))
     
-        plot.phylo(tree,plot=FALSE,no.margin=T,y.lim=x.lim,direction="upwards")
+        plot.phylo(tree,plot=FALSE,no.margin=T,y.lim=x.lim,direction="upwards",...)
           
           timescale.rescaled.names <- timescale.rescaled
            timescale.rescaled.names <- timescale.rescaled.names[timescale.rescaled.names[,"End"] > par()$usr[3],]
@@ -162,8 +178,8 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
          depth <- unit.depths[length(unit.depths) - 1] - unit.depths[length(unit.depths)]
     
         if(tick.scale != "n" && tick.scale != "no"){
-          text((unit.depths[length(unit.depths)]+depth*0.3),time2,time,cex=cex.age,srt=0)           
-           segments((unit.depths[length(unit.depths)-1]),ticks,(unit.depths[length(unit.depths)]+depth*0.75),ticks,lwd=lwd,col=col)
+          text((unit.depths[length(unit.depths)]+depth*0.3),age.position,age.name,cex=cex.age,srt=0)           
+           segments((unit.depths[length(unit.depths)-1]),tick.position,(unit.depths[length(unit.depths)]+depth*0.75),tick.position,lwd=lwd,col=col)
         }
     
     for(t in 1:length(units)){
@@ -184,18 +200,20 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
     }
     
     # ADDING THE PHYLOGENY
-    par(fig=c((ts.width)+0.001,1,0,1),new=T)
+    par(fig=c(ts.width,1,0,1),new=T)
      par(mar=c(3,0,2,2))
     
-      plot.phylo(tree,plot=FALSE,no.margin=T,y.lim=x.lim,direction="upwards")
+      plot.phylo(tree,plot=FALSE,no.margin=T,y.lim=x.lim,direction="upwards",...)
         lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
     
-      if (! missing(boxes)){
+      if (!missing(boxes) && boxes != "no" && boxes !="n"){
        if(boxes == "User"){
-         tscale<-user.scale
+         tscale <- root.age - user.scale[,c("Start","End")]
        } else {
-         tscale<-subset(timescale.rescaled,timescale.rescaled[,"Type"] == boxes)} 
-        rect(par()$usr[3],tscale[,"Start"],par()$usr[4],tscale[,"End"],col=c("grey90","white"),border=NA)}
+         tscale<-subset(timescale.rescaled,timescale.rescaled[,"Type"] == boxes)}
+       
+           rect(par()$usr[3],tscale[,"Start"],par()$usr[4],tscale[,"End"],col=c("grey90","white"),border=NA)
+       }
         
       par(fig=c(ts.width,1,0,1),new=T)
         par(mar=c(3,0,2,2))
@@ -205,14 +223,20 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
             segments(lastPP$xx[c(1:length(tree$tip.label))],taxon.ranges[,"FAD"],lastPP$xx[c(1:length(tree$tip.label))],taxon.ranges[,"LAD"],col="black",lwd=width*2)
           }
     
+    if(units[1] == "User"){
+      segments(par()$usr[1],min(root.age - user.scale[,"Start"]),par()$usr[1],max(root.age - user.scale[,"End"]))
+    } else {      
+      segments(par()$usr[1],min(timescale.rescaled[timescale.rescaled[,"Type"] == units[1],"Start"]),par()$usr[1],max(timescale.rescaled[timescale.rescaled[,"Type"] == units[1],"End"]))
+    }
+       
   } else{
     # Plotting the tree horizontally
     
   # PLOT 1 - TIMESCALE
-    par(fig=c(0,1,0,(ts.width)+0.001))
+    par(fig=c(0,1,0,ts.width))
     par(mar=c(1,3,0,2))
 
-	    plot.phylo(tree,plot=FALSE,no.margin=T,x.lim=x.lim,direction="rightwards")
+	    plot.phylo(tree,plot=FALSE,no.margin=T,x.lim=x.lim,direction="rightwards",...)
     
         timescale.rescaled.names <- timescale.rescaled
          timescale.rescaled.names <- timescale.rescaled.names[timescale.rescaled.names[,"End"] > par()$usr[1],]
@@ -239,8 +263,8 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
        depth <- unit.depths[length(unit.depths) - 1] - unit.depths[length(unit.depths)]
     
     if(tick.scale != "n" && tick.scale != "no"){
-      text(time2,(unit.depths[length(unit.depths)]+depth*0.3),time, cex=cex.age,srt=90)
-  	  segments(ticks,(unit.depths[length(unit.depths)-1]),ticks,(unit.depths[length(unit.depths)]+depth*0.6),lwd=lwd,col=col)
+      text(age.position,(unit.depths[length(unit.depths)]+depth*0.3),age.name, cex=cex.age,srt=90)
+  	  segments(tick.position,(unit.depths[length(unit.depths)-1]),tick.position,(unit.depths[length(unit.depths)]+depth*0.6),lwd=lwd,col=col)
     }
 
     for(t in 1:length(units)){
@@ -261,24 +285,31 @@ geoscalePhylo<-function(tree, ages, upwards=FALSE, units=c("Period", "Epoch", "A
  
   ## PLOT 2: PHYLOGENY
 
-    par(fig=c(0,1,(ts.width)+0.001,1),new=T)
+    par(fig=c(0,1,ts.width,1),new=T)
     par(mar=c(0,3,2,2))
   
-      plot.phylo(tree,plot=FALSE,no.margin=T,x.lim=x.lim)
+      plot.phylo(tree,plot=FALSE,no.margin=T,x.lim=x.lim,...)
         lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
   
-      if (!missing(boxes)){
+      if (!missing(boxes) && boxes != "no" && boxes !="n"){
         if(boxes == "User"){
-          tscale<-user.scale
+          tscale <- root.age - user.scale[,c("Start","End")]
         } else {tscale<-subset(timescale.rescaled,timescale.rescaled[,"Type"] == boxes)} 
   	        rect(tscale[,"Start"],par()$usr[3],tscale[,"End"],par()$usr[4],col=c("grey90","white"),border=NA)}
 
-    par(fig=c(0,1,(ts.width)+0.001,1),new=T)
+    par(fig=c(0,1,ts.width,1),new=T)
     par(mar=c(0,3,2,2))
   
       plot.phylo(tree,label.offset=offset,edge.width=width,no.margin=T,x.lim=x.lim,cex=cex.tip,...)
         if (ranges == TRUE){
           segments(taxon.ranges[,"FAD"],lastPP$yy[c(1:length(tree$tip.label))],taxon.ranges[,"LAD"],lastPP$yy[c(1:length(tree$tip.label))],col="black",lwd=width*2)
         }
+  
+  if(units[1] == "User"){
+    segments(min(root.age - user.scale[,"Start"]),par()$usr[3],max(root.age - user.scale[,"End"]),par()$usr[3])
+  } else {      
+    segments(min(timescale.rescaled[timescale.rescaled[,"Type"] == units[1],"Start"]),par()$usr[3],max(timescale.rescaled[timescale.rescaled[,"Type"] == units[1],"End"]),par()$usr[3])
+  }
+  
   }
 }
