@@ -1,4 +1,4 @@
-StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=1000, rand.perm=1000, hard=TRUE, randomly.sample.ages=FALSE, fix.topology=FALSE, fix.outgroup=TRUE) {
+StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=1000, rand.perm=1000, hard=TRUE, randomly.sample.ages=FALSE, fix.topology=TRUE, fix.outgroup=TRUE) {
 
   # Make sure permutation numbers are not negative:
   if(samp.perm <= 0 || rand.perm <= 0) stop("Number of permutations must be positive.")
@@ -247,14 +247,14 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=
   input.permutations <- matrix(ncol=10, nrow=length(trees))
   
   # Annotate matrix:
-  colnames(input.permutations) <- c("SCI", "RCI", "GER", "MSM*", "p.SCI", "p.RCI", "p.GER", "p.MSM*", "GER*", "GERt")
+  colnames(input.permutations) <- c("SCI", "RCI", "GER", "MSM*", "est.p.SCI", "est.p.RCI", "est.p.GER", "est.p.MSM*", "GER*", "GERt")
   rownames(input.permutations) <- paste("tree_",c(1:length(trees)),sep="")  
 
   # Calculate Gmax (the worst possible fit to stratigraphy):
   Gmax <- sum(root.age - ages[, "FAD"])
   
   # Calculate Gmin (the best possible fit to stratigraphy - if no ADRs):
-  Gmin <- sum(diff(sort(ages[, "FAD"]))) + (2 * (root.age - max(ages[, "FAD"])))
+  Gmin <- diff(range(ages[, "FAD"])) + (2 * (root.age - max(ages[, "FAD"])))
 
   # Start progress bar:
   pb <- txtProgressBar(min = 0, max = (Ntrees + samp.perm + rand.perm), style = 3)
@@ -330,7 +330,7 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=
     samp.permutations <- matrix(nrow=samp.perm, ncol=10)
 
     # Add column names:
-    colnames(samp.permutations) <- c("SCI", "RCI", "GER", "MSM*", "p.SCI", "p.RCI", "p.GER", "p.MSM*", "GER*", "GERt")
+    colnames(samp.permutations) <- c("SCI", "RCI", "GER", "MSM*", "est.p.SCI", "est.p.RCI", "est.p.GER", "est.p.MSM*", "GER*", "GERt")
 
     # For each sample permutation:
     for(i in 1:samp.perm) {
@@ -543,31 +543,31 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=
   close(pb)
   
   # Calculate input tree p.values for SCI:
-  input.permutations[, "p.SCI"] <- pnorm(input.permutations[, "SCI"], mean(rand.permutations[, "SCI"]), sd(rand.permutations[, "SCI"]), lower.tail=FALSE)
+  input.permutations[, "est.p.SCI"] <- pnorm(asin(sqrt(input.permutations[, "SCI"])), mean(asin(sqrt(rand.permutations[, "SCI"]))), sd(asin(sqrt(rand.permutations[, "SCI"]))), lower.tail=FALSE)
 
   # Calculate input tree p.values for RCI:
-  input.permutations[, "p.RCI"] <- pnorm(input.permutations[, "RCI"], mean(rand.permutations[, "RCI"]), sd(rand.permutations[, "RCI"]), lower.tail=FALSE)
+  input.permutations[, "est.p.RCI"] <- pnorm(input.permutations[, "RCI"], mean(rand.permutations[, "RCI"]), sd(rand.permutations[, "RCI"]), lower.tail=FALSE)
   
   # Calculate input tree p.values for GER:
-  input.permutations[, "p.GER"] <- pnorm(input.permutations[, "GER"], mean(rand.permutations[, "GER"]), sd(rand.permutations[, "GER"]), lower.tail=FALSE)
+  input.permutations[, "est.p.GER"] <- pnorm(asin(sqrt(input.permutations[, "GER"])), mean(asin(sqrt(rand.permutations[, "GER"]))), sd(asin(sqrt(rand.permutations[, "GER"]))), lower.tail=FALSE)
   
   # Calculate input tree p.values for MSM*:
-  input.permutations[, "p.MSM*"] <- pnorm(input.permutations[, "MSM*"], mean(rand.permutations[, "MSM*"]), sd(rand.permutations[, "MSM*"]), lower.tail=FALSE)
+  input.permutations[, "est.p.MSM*"] <- pnorm(asin(sqrt(input.permutations[, "MSM*"])), mean(asin(sqrt(rand.permutations[, "MSM*"]))), sd(asin(sqrt(rand.permutations[, "MSM*"]))), lower.tail=FALSE)
   
   # If sample permutations were performed:
   if(samp.perm > 0) {
 
     # Calculate sample permutation p.values for SCI:
-    samp.permutations[, "p.SCI"] <- pnorm(samp.permutations[, "SCI"], mean(rand.permutations[, "SCI"]), sd(rand.permutations[, "SCI"]), lower.tail=FALSE)
+    samp.permutations[, "est.p.SCI"] <- pnorm(asin(sqrt(samp.permutations[, "SCI"])), mean(asin(sqrt(rand.permutations[, "SCI"]))), sd(asin(sqrt(rand.permutations[, "SCI"]))), lower.tail=FALSE)
   
     # Calculate sample permutation p.values for RCI:
-    samp.permutations[, "p.RCI"] <- pnorm(samp.permutations[, "RCI"], mean(rand.permutations[, "RCI"]), sd(rand.permutations[, "RCI"]), lower.tail=FALSE)
+    samp.permutations[, "est.p.RCI"] <- pnorm(samp.permutations[, "RCI"], mean(rand.permutations[, "RCI"]), sd(rand.permutations[, "RCI"]), lower.tail=FALSE)
   
     # Calculate sample permutation p.values for GER:
-    samp.permutations[, "p.GER"] <- pnorm(samp.permutations[, "GER"], mean(rand.permutations[, "GER"]), sd(rand.permutations[, "GER"]), lower.tail=FALSE)
+    samp.permutations[, "est.p.GER"] <- pnorm(asin(sqrt(samp.permutations[, "GER"])), mean(asin(sqrt(rand.permutations[, "GER"]))), sd(asin(sqrt(rand.permutations[, "GER"]))), lower.tail=FALSE)
   
     # Calculate sample permutation p.values for MSM*:
-    samp.permutations[, "p.MSM*"] <- pnorm(samp.permutations[, "MSM*"], mean(rand.permutations[, "MSM*"]), sd(rand.permutations[, "MSM*"]), lower.tail=FALSE)
+    samp.permutations[, "est.p.MSM*"] <- pnorm(asin(sqrt(samp.permutations[, "MSM*"])), mean(asin(sqrt(rand.permutations[, "MSM*"]))), sd(asin(sqrt(rand.permutations[, "MSM*"]))), lower.tail=FALSE)
   
     # For each sampled tree:
     for(i in 1:samp.perm) {
@@ -616,6 +616,29 @@ StratPhyloCongruence <- function(trees, ages, rlen=0, method="basic", samp.perm=
 
   # Add MIG to column headings:
   colnames(rand.permutations)[length(colnames(rand.permutations))] <- "MIG"
+
+  # If sample permutations were performed:
+  if(samp.perm > 0) {
+
+    # Add Wills p column:
+    samp.permutations <- cbind(samp.permutations, rep(0, samp.perm))
+
+    # Add Wills p to column headings:
+    colnames(samp.permutations)[length(colnames(samp.permutations))] <- "p.Wills"
+
+    # Add Wills p values:
+    for(i in 1:samp.perm) samp.permutations[i, "p.Wills"] <- 1 - (sum(samp.permutations[i, "MIG"] < rand.permutations[, "MIG"]) / rand.perm)
+
+  }
+
+  # Add Wills p column:
+  input.permutations <- cbind(input.permutations, rep(0, nrow(input.permutations)))
+
+  # Add Wills p to column headings:
+  colnames(input.permutations)[length(colnames(input.permutations))] <- "p.Wills"
+
+  # Add Wills p values:
+  for(i in 1:nrow(input.permutations)) input.permutations[i, "p.Wills"] <- 1 - (sum(input.permutations[i, "MIG"] < rand.permutations[, "MIG"]) / rand.perm)
 
   # Compile output as list:
   output <- list(input.permutations, samp.permutations, rand.permutations, trees, samp.trees, rand.trees)

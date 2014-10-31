@@ -8,8 +8,8 @@
 \tabular{ll}{
 Package: \tab strap\cr
 Type: \tab Package\cr
-Version: \tab 1.3\cr
-Date: \tab 2014-08-08\cr
+Version: \tab 1.4\cr
+Date: \tab 2014-10-31\cr
 License: \tab GPL (>=2)\cr
 LazyLoad: \tab yes\cr
 }
@@ -31,5 +31,6 @@ Wills, M. A., 1999, Congruence between phylogeny and stratigraphy: randomization
 fit.to.strat.1 <- StratPhyloCongruence(trees=Dipnoi$tree, ages=Dipnoi$ages, rlen=0,
 	method="basic", samp.perm=5, rand.perm=5, hard=TRUE,
 	randomly.sample.ages=FALSE, fix.topology=FALSE, fix.outgroup=TRUE)
+	
 fit.to.strat.1$input.tree.results # Show just the output for the input tree(s)
 }

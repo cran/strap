@@ -46,7 +46,7 @@ DatePhylo <- function(tree, ages, rlen=0, method="basic", add.terminal=FALSE) {
   time.tree$edge.length <- abs(apply(matrix(all.ages[tree$edge], ncol=2), 1, diff))
 
   # Only continue if non basic dating option chosen:
-  if (method != "basic") {
+  if(method != "basic") {
     
     # Keep going until there are no zero-length branches:
     while(min(time.tree$edge.length[grep(TRUE, tree$edge.length > 0)]) == 0) {
@@ -70,7 +70,7 @@ DatePhylo <- function(tree, ages, rlen=0, method="basic", add.terminal=FALSE) {
       
       # Get novel node ages (based on equal method):
       new.node.ages <- seq(from=range(all.ages[time.tree$edge[share.branches]])[1], to=range(all.ages[time.tree$edge[share.branches]])[2], by=sum(time.tree$edge.length[share.branches]) / n.branches.to.share)
-      
+
       # Case if dating method is Ruta:
       if(method == "ruta") {
         
@@ -78,13 +78,13 @@ DatePhylo <- function(tree, ages, rlen=0, method="basic", add.terminal=FALSE) {
         branch.proportions <- ((tree$edge.length[share.branches] / sum(tree$edge.length[share.branches])))
         
         # Update novel node ages:
-        new.node.ages <- c(new.node.ages[1], (branch.proportions[1:(length(branch.proportions) - 1)] * diff(range(new.node.ages))) + min(range(new.node.ages)), new.node.ages[length(new.node.ages)])
+        new.node.ages <- c(new.node.ages[1], cumsum(branch.proportions[1:(length(branch.proportions) - 1)] * diff(range(new.node.ages))) + min(range(new.node.ages)), new.node.ages[length(new.node.ages)])
 
       }
       
       # Update node ages:
       all.ages[unique(as.vector(time.tree$edge[share.branches, 2:1]))] <- new.node.ages
-      
+
       # Update branch lengths as time:
       time.tree$edge.length <- abs(apply(matrix(all.ages[tree$edge], ncol=2), 1, diff))
 
