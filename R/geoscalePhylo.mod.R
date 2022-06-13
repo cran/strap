@@ -6,6 +6,7 @@
 #'
 #' @param tree A tree as a phylo object.
 #' @param ages A dataset containing the first and last appearence datums,"FAD" and "LAD" respectively, of all taxa in the phylogeny. See the object $ages in utils::data(Dipnoi) for an example.
+#' @param occs UNKNOWN.
 #' @param direction The direction the tree is to be plotted in, options include "rightwards" and "upwards", see help(plot.phylo).
 #' @param units The temporal unit(s) to be included in the timescale, options include: "Eon", "Era", "Period", "Epoch", "Age" and "User". The option "User" is required when including a user-defined timescale. This also requires an object to be assigned to user.scale (see Details).
 #' @param boxes Option for including grey boxes at a certain temporal resolution, options are the same as for units.
@@ -104,19 +105,18 @@
 #' #  "Epoch", "Age", "User"), boxes = "Age", cex.tip = 0.4, user.scale = UKzones,
 #' #  vers = "ICS2009", cex.ts = 0.5, x.lim = c(520, 440), arotate = 0, erotate = 0, urotate = 0)
 #'
-#' @export geoscalePhylo
-geoscalePhylo <- function(tree, ages, direction = "rightwards", units = c("Period", "Epoch", "Age"), boxes = "Age", tick.scale = "myr", user.scale, cex.age = 0.3, cex.ts = 0.3, cex.tip = 0.3, width = 1, label.offset,ts.col = TRUE, vers = "ICS2013", x.lim, quat.rm = FALSE, erotate, arotate, urotate, ...) {
+#' @export geoscalePhylo.mod
+geoscalePhylo.mod <- function(tree, ages, occs, direction = "rightwards", units = c("Period", "Epoch", "Age"), boxes = "Age", tick.scale = "myr", user.scale, cex.age = 0.3, cex.ts = 0.3, cex.tip = 0.3, width = 1, label.offset,ts.col = TRUE, vers = "ICS2013", x.lim, quat.rm = FALSE, erotate, arotate, urotate, ...) {
   
   options <- as.list(match.call())
    if(any(names(options) == "type")){
-     if(all(options$type != c("phylogram", "cladogram", "p", "c"))){
+     if(all(options$type != c("phylogram","cladogram","p","c"))){
        return(cat("type must be either 'phylogram' or 'cladogram'."))
      }
    }
 
   if(all(direction != c("rightwards","upwards"))){
       return(cat("direction must be either 'rightwards' or 'upwards', here set to 'rightwards'."))
-      direction <- "rightwards"
     }
   
   if(is.null(tree$root.time)){     
@@ -137,8 +137,10 @@ geoscalePhylo <- function(tree, ages, direction = "rightwards", units = c("Perio
    
   if(missing(ages) == FALSE){
       ranges <- TRUE
+      age.data <- "present"
   } else{
       ranges <- FALSE
+      age.data <- "required"
   }
   
   if(missing(user.scale) & any(units == "User")){
@@ -146,10 +148,43 @@ geoscalePhylo <- function(tree, ages, direction = "rightwards", units = c("Perio
     cat("\n user.scale not provided, 'Other' removed from units.")
   }
   
-  if(missing(ages) == FALSE){
-    ages<-ages[tree$tip.label,]    
-  }
+  if(age.data == "present"){
+    ages<-ages[tree$tip.label,]
+  }  	
   
+  if(age.data == "required" && missing(occs) == FALSE){
+  	ages <- matrix(ncol=2,nrow=Ntip(tree),data=root.age)
+  	 rownames(ages) <- tree$tip.label
+  	 colnames(ages) <- c("FAD","LAD")
+  	  ranges = TRUE
+  }	 
+  	 
+  if(missing(occs) == FALSE){
+  	species.occs <- vector("list",Ntip(tree))
+  	 names(species.occs) <- tree$tip.label
+  	  for(tip in 1:Ntip(tree)){
+  		if(length(strsplit(tree$tip.label[tip],"_")[[1]]) > 1){
+  		  species.data <- subset(occs,paste(occs[,"occurrence.genus_name"],occs[,"occurrence.species_name"],sep="_") == tree$tip.label[tip])
+  		   if(length(species.data[,1]) > 0){
+  		   	species.occs[[tip]] <- unique(species.data[,"ma_mid"])
+  		   	 if(age.data == "required"){
+  		   	 	ages[tip,"FAD"] <- max(species.data[,"ma_max"])
+  		   	    ages[tip,"LAD"] <- min(species.data[,"ma_min"])
+  		   	 }
+  		   }
+  		} else{
+  		  genus.data <- subset(occs,occs[,"occurrence.genus_name"] == tree$tip.label[tip])
+  	       if(length(genus.data[,1]) > 0){
+  		 	species.occs[[tip]] <- unique(genus.data[,"ma_mid"])
+  		 	 if(age.data == "required"){
+  		   	 	ages[tip,"FAD"] <- max(genus.data[,"ma_max"])
+  		   	    ages[tip,"LAD"] <- min(genus.data[,"ma_min"])
+  		   	 }
+  		   }
+  		}
+  	  }	
+  }	 
+  	   	  
   if(any(units == "User") & !missing(user.scale)){   
     Midpoint <- matrix(ncol=1,nrow=length(user.scale[,1]))
       Midpoint[,1] <- (user.scale[,"Start"] + user.scale[,"End"])/2
@@ -185,7 +220,7 @@ geoscalePhylo <- function(tree, ages, direction = "rightwards", units = c("Perio
     ts.width=0.25
   }
 
-  if(ranges == TRUE && missing(ages) == FALSE){
+  if(ranges == TRUE && age.data == "present"){
      missing.tip.names <- setdiff(tree$tip.label,row.names(ages))
       if(length(missing.tip.names) > 0){            
         cat(paste("\n",missing.tip.names,"not present in ages file, ranges set to FALSE"))
@@ -358,8 +393,8 @@ geoscalePhylo <- function(tree, ages, direction = "rightwards", units = c("Perio
       }
           
       if(ts.col == TRUE & units[t] != "User"){
-        graphics::rect(tscale[,"Start"],unit.depths[t],tscale[,"End"],unit.depths[t+1], col=grDevices::rgb(tscale[,"Col_R"], tscale[,"Col_G"], tscale[,"Col_B"], maxColorValue=255))
-      } else graphics::rect(tscale[,"Start"],unit.depths[t],tscale[,"End"],unit.depths[t+1],col="white")
+        graphics::rect(unit.depths[t],tscale[,"Start"],unit.depths[t+1],tscale[,"End"],col=grDevices::rgb(tscale[,"Col_R"],tscale[,"Col_G"],tscale[,"Col_B"],maxColorValue=255))
+      } else graphics::rect(unit.depths[t],tscale[,"Start"],unit.depths[t+1],tscale[,"End"],col="white")
       graphics::text((unit.depths[t] + unit.depths[t+1])/2,tscale.names[,"Midpoint"],tscale.names[,"Name"],cex=cex.ts*tscale.data[match(units[t],rownames(tscale.data)),"size"],srt=tscale.data[match(units[t],rownames(tscale.data)),"srt"])
     }
     
@@ -480,4 +515,12 @@ geoscalePhylo <- function(tree, ages, direction = "rightwards", units = c("Perio
   }
   
   }
+  #### PaleoDB occurrences
+
+   if(missing(occs) == FALSE){
+	 for(o in 1:Ntip(tree)){
+     graphics::points(root.age - species.occs[[o]],rep(lastPP$yy[o],length(species.occs[[o]])),col="red",pch=19,cex=cex.tip)
+	  }
+	}
+ 
 }

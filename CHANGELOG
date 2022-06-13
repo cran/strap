@@ -1,3 +1,15 @@
+Version - 1.6 - 2022-06-10
+
+- Fixes to package to work better with CRAN (changes invisible to user).
+- Added proto-versions of DateNodeHedman and DatePhyloHedman functions. These are not yet properly documented or tested.
+
+Version - 1.5 - 2019-08-17
+
+- Restructured package to work with the devtools package (changes invisible to user but makes package easier to update).
+- Complete structural overhaul of StratPhyloCongruence function to improve speed.
+- Additional options to StratPhyloCongruence to drop SCI calculation (for speed) and to manually provide outgroup taxon (safer than letting function guess this).
+- Minor speed up to DatePhylo.
+
 Version - 1.4 - 2014-10-31
 
 - Added three arguments to geoscalePhylo (erotate,arotate and urotate) that allows for the text in the Epoch, Age and User temporal units to be rotated by the user.
@@ -10,6 +22,10 @@ Version - 1.4 - 2014-10-31
 - Updated help files for StratPhyloCongruence to note the p-value output changes.
 
 Version - 1.3 - 2014-08-08
+
 - Option added to geoscalePhylo that allows the tree to be plotted vertically using the new argument direction.
+
+Version - 1.2 - 2014-05-12
+
 - Fixed DatePhylo bug with equal and ruta methods regarding order in which branch-sharing occurs (see timePaleoPhy  function in paleotree for additional
  
